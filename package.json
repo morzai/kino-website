@@ -1,0 +1,40 @@
+{
+  "name": "Kino",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist package-lock.json node_modules",
+    "lint": "semistandard \"client/**/*.js\" \"server/**/*.js\"",
+    "setup:dist": "rimraf dist && mkdirp dist && copyfiles -u 1 client/index.html dist",
+    "build:css": "lessc client/style.less dist/style.css --clean-css",
+    "bundle:js": "esbuild client/script.js --bundle --outfile=dist/bundle.js",
+    "minify:js": "terser dist/bundle.js --compress --mangle --comments=false -o dist/bundle.min.js && shx mv dist/bundle.min.js dist/bundle.js",
+    "prebuild": "npm run lint && npm run setup:dist",
+    "build": "npm run build:css && npm run bundle:js && npm run minify:js",
+    "predebug": "npm run lint && npm run setup:dist",
+    "debug": "npm run build:css && npm run bundle:js",
+    "dev": "nodemon server/server.js 8080",
+    "start": "node server/server.js 8080",
+    "run": "npm install && npm run build && npm start"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "mongoose": "^8.9.5",
+    "qrcode": "^1.5.4",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "esbuild": "^0.27.2",
+    "less": "^4.2.0",
+    "less-plugin-clean-css": "^1.5.1",
+    "mkdirp": "^3.0.1",
+    "nodemon": "^3.1.11",
+    "rimraf": "^6.1.2",
+    "semistandard": "^17.0.0",
+    "shx": "^0.4.0",
+    "terser": "^5.44.1"
+  }
+}

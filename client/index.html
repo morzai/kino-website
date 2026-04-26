@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineFlow Verwaltung</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="bundle.js" defer></script>
+</head>
+
+<body>
+  <header class="app-header">
+    <h1 class="app-title">🎬 CineFlow Verwaltung</h1>
+
+    <button id="role-switch-btn" class="btn-secondary hidden header-action">
+      🔄 Rolle wechseln
+    </button>
+  </header>
+
+  <section id="role-selection" class="section active">
+    <div class="card">
+      <h2 class="center-title">Wer bist du?</h2>
+
+      <div class="role-options">
+        <label class="role-option">
+          <input type="radio" name="role" value="betreiber">
+          <div class="role-card">
+            ⚙️
+            <span>Betreiber</span>
+          </div>
+        </label>
+
+        <label class="role-option">
+          <input type="radio" name="role" value="kunde">
+          <div class="role-card">
+            👤
+            <span>Kunde</span>
+          </div>
+        </label>
+      </div>
+
+      <div style="text-align: center; margin-top: 2rem;">
+        <button id="continue-btn" class="btn-primary">
+          ➡️ Weiter
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="operator-area" class="section">
+    <div class="card card-tabs">
+      <h2>⚙️ Betreiberbereich</h2>
+      <p>Hier können Sie Kinosäle und Vorstellungen verwalten.</p>
+
+      <div class="tab-navigation">
+        <button id="tab-btn-forms" class="btn-tab active" type="button">
+          ➕ Verwaltung
+        </button>
+        <button id="tab-btn-lists" class="btn-tab" type="button">
+          📋 Listen &amp; Übersicht
+        </button>
+      </div>
+    </div>
+
+    <div id="operator-forms-container" class="forms-lists-container">
+      <div class="card">
+        <h3>➕ Kinosaal anlegen</h3>
+        <form id="create-hall-form">
+          <div class="form-group">
+            <label for="hall-name">Name:</label>
+            <input id="hall-name" type="text" placeholder="z.B. Saal 1" required>
+          </div>
+          <div class="form-group">
+            <label for="hall-rows">Sitzreihen:</label>
+            <input id="hall-rows" type="number" min="1" max="50" value="5" required>
+          </div>
+          <div class="form-group">
+            <label for="hall-seats">Sitze pro Reihe:</label>
+            <input id="hall-seats" type="number" min="1" max="50" value="8" required>
+          </div>
+          <button type="submit" class="btn-success">
+            ✅ Saal erstellen
+          </button>
+        </form>
+      </div>
+
+      <div class="card hidden">
+        <h3>➕ Vorstellung anlegen</h3>
+        <form id="create-screening-form">
+          <div class="form-group">
+            <label for="screening-hall">Kinosaal:</label>
+            <select id="screening-hall" required>
+              <option value="">Bitte wählen...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="screening-date">Datum:</label>
+            <input id="screening-date" type="date" required>
+          </div>
+          <div class="form-group">
+            <label for="screening-time">Uhrzeit:</label>
+            <input
+              id="screening-time"
+              type="text"
+              inputmode="numeric"
+              placeholder="HH:MM"
+              pattern="^([01]\d|2[0-3]):[0-5]\d$"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label for="screening-movie">Filmtitel:</label>
+            <input id="screening-movie" type="text" placeholder="z.B. Inception" required>
+          </div>
+          <button type="submit" class="btn-success">
+            ✅ Vorstellung erstellen
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="operator-lists-container" class="forms-lists-container hidden">
+      <div class="card fill-window">
+        <h3>🏢 Vorhandene Kinosäle</h3>
+        <div class="table-container" id="operator-halls-container">
+          <table id="operator-halls-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Reihen</th>
+                <th>Sitze pro Reihe</th>
+                <th>Gesamtsitze</th>
+              </tr>
+            </thead>
+            <tbody id="operator-halls-list"></tbody>
+          </table>
+        </div>
+        <div id="operator-halls-pagination" class="pagination"></div>
+      </div>
+
+      <div class="card hidden fill-window">
+        <h3>📅 Vorhandene Vorstellungen</h3>
+        <div class="table-container" id="operator-screenings-container">
+          <table id="operator-screenings-table">
+            <thead>
+              <tr>
+                <th>Film</th>
+                <th>Beginn</th>
+                <th>Saal</th>
+                <th>Belegte Sitze</th>
+              </tr>
+            </thead>
+            <tbody id="operator-screenings-list"></tbody>
+          </table>
+        </div>
+        <div id="operator-screenings-pagination" class="pagination"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="customer-area" class="section">
+    <div class="card" id="customer-intro-card">
+      <h2>👤 Kundenbereich</h2>
+      <p>Wählen Sie eine Vorstellung aus und reservieren Sie Ihre Sitzplätze.</p>
+    </div>
+
+    <div id="customer-area-table" class="card fill-window">
+      <h3>📋 Verfügbare Vorstellungen</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Film</th>
+              <th>Beginn</th>
+              <th>Saal</th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="customer-screenings-list"></tbody>
+        </table>
+      </div>
+      <div id="customer-screenings-pagination" class="pagination"></div>
+    </div>
+
+    <div class="card hidden" id="selected-screening-card">
+      <h3>🎬 Ausgewählte Vorstellung</h3>
+      <div id="selected-screening-info">
+        <p>🎬 <strong>Film:</strong> <span id="selected-movie"></span></p>
+        <p>⏰ <strong>Beginn:</strong> <span id="selected-time"></span></p>
+        <p>🚪 <strong>Saal:</strong> <span id="selected-hall"></span></p>
+      </div>
+    </div>
+
+    <div class="card hidden seat-card" id="seat-selection-card">
+      <h3>🪑 Sitzplatzauswahl</h3>
+
+      <div id="selected-seats-display" class="seat-count">
+        Ausgewählte Sitze: <span id="selected-seats-count">0</span>
+      </div>
+
+      <div id="screen-display">
+        🎬 L E I N W A N D 🎬
+      </div>
+
+      <div class="seat-grid-wrap">
+        <div id="seat-grid"></div>
+      </div>
+
+      <div class="seat-actions">
+        <button id="select-seats-btn" class="btn-primary" disabled type="button">
+          ✅ Weiter zur Reservierung
+        </button>
+        <button id="cancel-seat-selection-btn" class="btn-secondary" type="button">
+          ❌ Abbrechen
+        </button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="reservation-form-card">
+      <h3>📝 Reservierung abschließen</h3>
+
+      <form id="reservation-form">
+        <div class="form-group">
+          <label for="customer-name">👤 Ihr Name:</label>
+          <input id="customer-name" type="text" placeholder="Max Mustermann" required>
+        </div>
+
+        <div id="reservation-summary" style="background: #f9f0f3; padding: 15px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #6d1a36;">
+          <h4 style="color: #6d1a36; margin-bottom: 10px;">
+            🛒 Reservierungsübersicht
+          </h4>
+          <p><strong>Film:</strong> <span id="summary-movie"></span></p>
+          <p><strong>Zeit:</strong> <span id="summary-time"></span></p>
+          <p><strong>Saal:</strong> <span id="summary-hall"></span></p>
+          <p><strong>Sitze:</strong> <span id="summary-seats" style="color: #6d1a36; font-weight: 600;"></span></p>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+          <button type="submit" class="btn-primary">
+            🛒 Reservierung bestätigen
+          </button>
+          <button type="button" id="cancel-reservation-btn" class="btn-secondary">
+            ❌ Abbrechen
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card hidden" id="qr-code-card">
+      <h3>📱 Ihre Reservierung</h3>
+      <p style="text-align: center; margin-bottom: 20px;">
+        Ihr QR-Code wurde erfolgreich generiert. Bewahren Sie diesen für den Kinobesuch auf.
+      </p>
+      <div style="display: flex; justify-content: center;">
+        <div id="real-qr"></div>
+      </div>
+      <div style="margin-top: 2rem; text-align: center;">
+        <button id="print-qr-btn" class="btn-success" type="button">
+          🖨 QR-Code drucken
+        </button>
+        <button id="new-reservation-btn" class="btn-secondary" style="margin-left: 10px;" type="button">
+          ➕ Neue Reservierung
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>CineFlow Verwaltung &copy; 2026</p>
+  </footer>
+</body>
+</html>
